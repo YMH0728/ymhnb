@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#050914">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>星夜圣诞树 · Mobile</title>
+<style>
+:root{color-scheme:dark;--glass:rgba(12,20,38,.74);--line:rgba(190,215,255,.16);--muted:#9eacc8;--gold:#ffd88a;--cyan:#9fe8ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#040812;color:#f5f7ff;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","PingFang SC","Microsoft YaHei",sans-serif;touch-action:none}
+#scene{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 43%,transparent 28%,rgba(1,5,15,.18) 72%,rgba(1,4,12,.68) 115%);z-index:1}
+.topbar{position:fixed;z-index:4;left:0;right:0;top:0;padding:calc(env(safe-area-inset-top) + 12px) 15px 12px;display:flex;align-items:center;justify-content:space-between;pointer-events:none}
+.brand{font-weight:700;letter-spacing:.12em;font-size:12px;color:rgba(225,236,255,.82);text-shadow:0 2px 12px #000}
+.iconbtn{pointer-events:auto;border:1px solid var(--line);background:rgba(12,20,38,.5);color:#fff;border-radius:13px;width:42px;height:42px;display:grid;place-items:center;font-size:18px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.hint{position:fixed;z-index:3;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 16px);text-align:center;font-size:11px;letter-spacing:.08em;color:rgba(220,231,255,.54);pointer-events:none;text-shadow:0 2px 8px #000}
+.overlay{position:fixed;z-index:8;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;padding-bottom:calc(20px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(2,7,18,.38),rgba(2,7,18,.72));backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);transition:opacity .28s ease,visibility .28s ease}
+.overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.panel{width:min(100%,420px);max-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom));overflow:auto;border:1px solid rgba(190,215,255,.2);border-radius:26px;padding:23px 20px 20px;background:linear-gradient(155deg,rgba(16,28,52,.94),rgba(7,13,29,.94));box-shadow:0 25px 90px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.08);overscroll-behavior:contain}
+.eyebrow{color:#b8d9ff;font-size:10px;letter-spacing:.24em;text-align:center;margin-bottom:10px}
+h1{font-size:27px;line-height:1.2;text-align:center;letter-spacing:.08em;margin:0 0 8px;font-weight:650;background:linear-gradient(100deg,#fff,#ffe5b1 52%,#b9eaff);background-clip:text;-webkit-background-clip:text;color:transparent}
+.subtitle{margin:0 auto 20px;text-align:center;color:#aebbd3;font-size:12px;line-height:1.7;max-width:300px}
+.sectionlabel{font-size:11px;color:#c6d3e9;letter-spacing:.1em;margin:0 0 10px}
+.quality-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.q-option{position:relative;min-height:76px;text-align:left;border:1px solid rgba(179,205,242,.15);border-radius:15px;padding:12px 12px 10px;background:rgba(255,255,255,.035);color:#f5f7ff;display:flex;flex-direction:column;gap:5px;justify-content:center}
+.q-option.selected{border-color:rgba(255,213,137,.82);background:linear-gradient(145deg,rgba(255,210,125,.14),rgba(111,178,255,.08));box-shadow:inset 0 0 0 1px rgba(255,213,137,.15),0 0 22px rgba(255,193,103,.08)}
+.q-option .qname{font-size:13px;font-weight:650}.q-option .qdesc{font-size:10px;color:#9eacc5;line-height:1.45}.q-option .tick{position:absolute;right:10px;top:9px;color:var(--gold);font-size:12px;opacity:0}.q-option.selected .tick{opacity:1}
+.note{font-size:10px;line-height:1.6;color:#8999b7;margin:13px 2px 16px}
+.primary{width:100%;height:49px;border:0;border-radius:15px;color:#151522;font-weight:750;font-size:14px;letter-spacing:.12em;background:linear-gradient(100deg,#ffe7af,#f6c979 48%,#c3e7ff);box-shadow:0 9px 28px rgba(243,196,120,.2)}
+.secondary{width:100%;height:40px;margin-top:9px;border:1px solid rgba(190,215,255,.14);border-radius:13px;color:#c8d5ec;background:rgba(255,255,255,.035);font-size:12px}
+.stats{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:13px;color:#8292ae;font-size:9px;letter-spacing:.05em}
+.settings-panel{width:min(100%,360px)}.settings-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.settings-head strong{font-size:16px;letter-spacing:.08em}.close{border:1px solid var(--line);width:34px;height:34px;border-radius:11px;background:rgba(255,255,255,.04);color:#fff;font-size:18px}
+.statusline{display:flex;justify-content:space-between;gap:12px;color:#93a4c2;font-size:11px;margin:15px 2px 0}
+@media (max-height:650px){.panel{padding:17px 17px 15px;border-radius:22px}.subtitle{margin-bottom:13px}.q-option{min-height:65px}.note{margin:9px 2px 11px}h1{font-size:23px}}
+@media (prefers-reduced-motion:reduce){.overlay{transition:none}}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="发光的3D圣诞树星空场景"></canvas>
+<div class="vignette"></div>
+<div class="topbar"><div class="brand">N O E L · S T A R S C A P E</div><button class="iconbtn" id="settingsBtn" aria-label="画质设置">⚙</button></div>
+<div class="hint" id="gestureHint">单指旋转 · 双指缩放 · 拖动欣赏星夜</div>
+
+<div class="overlay" id="welcome">
+  <section class="panel">
+    <div class="eyebrow">A QUIET WINTER NIGHT</div>
+    <h1>星夜圣诞树</h1>
+    <p class="subtitle">为手机屏幕优化的沉浸式 3D 星空体验<br>进入前选择适合你设备的画质</p>
+    <div class="sectionlabel">选择画质 · 可在场景中随时更改</div>
+    <div class="quality-grid" id="qualityChoices">
+      <button class="q-option selected" data-quality="auto"><span class="tick">✓</span><span class="qname">自动适配</span><span class="qdesc">根据设备性能动态调节</span></button>
+      <button class="q-option" data-quality="eco"><span class="tick">✓</span><span class="qname">省电流畅</span><span class="qdesc">适合旧款手机与长时间观看</span></button>
+      <button class="q-option" data-quality="balanced"><span class="tick">✓</span><span class="qname">高清画质</span><span class="qdesc">画面与流畅度均衡</span></button>
+      <button class="q-option" data-quality="ultra"><span class="tick">✓</span><span class="qname">极致画质</span><span class="qdesc">更多星光、雪花与细节</span></button>
+    </div>
+    <p class="note">不同手机的处理器、屏幕刷新率和浏览器能力不同。「自动适配」会按设备信息选择起始画质，并根据运行流畅度动态降低或恢复渲染分辨率。</p>
+    <button class="primary" id="enterBtn">进入星夜</button>
+    <div class="stats"><span>无需安装</span><span>·</span><span>单文件运行</span><span>·</span><span>支持触屏</span></div>
+  </section>
+</div>
+
+<div class="overlay hidden" id="settingsOverlay">
+  <section class="panel settings-panel">
+    <div class="settings-head"><strong>画面设置</strong><button class="close" id="closeSettings" aria-label="关闭">×</button></div>
+    <div class="sectionlabel">实时切换画质</div>
+    <div class="quality-grid" id="settingsChoices">
+      <button class="q-option selected" data-quality="auto"><span class="tick">✓</span><span class="qname">自动适配</span><span class="qdesc">动态平衡性能与画面</span></button>
+      <button class="q-option" data-quality="eco"><span class="tick">✓</span><span class="qname">省电流畅</span><span class="qdesc">较少粒子 · 低功耗</span></button>
+      <button class="q-option" data-quality="balanced"><span class="tick">✓</span><span class="qname">高清画质</span><span class="qdesc">清晰细节 · 流畅运行</span></button>
+      <button class="q-option" data-quality="ultra"><span class="tick">✓</span><span class="qname">极致画质</span><span class="qdesc">高密度粒子 · 更丰富光效</span></button>
+    </div>
+    <div class="statusline"><span>当前模式</span><span id="qualityStatus">自动适配</span></div>
+    <div class="statusline"><span>渲染帧率</span><span id="fpsStatus">-- FPS</span></div>
+    <button class="secondary" id="resumeBtn">返回星空</button>
+  </section>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const canvas=document.getElementById('scene');
+const ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
+if(!ctx){document.body.innerHTML='<div style="padding:30px;color:white">当前浏览器暂不支持 Canvas，请更新浏览器后再试。</div>';return;}
+const reducedMotion=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile=matchMedia('(pointer: coarse)').matches;
+const qualityNames={auto:'自动适配',eco:'省电流畅',balanced:'高清画质',ultra:'极致画质'};
+const profiles={
+ eco:{stars:90,snow:28,branches:260,ornaments:13,garland:100,shooting:2,shotMin:900,shotMax:1800,dpr:1.0,fps:30,glow:.55},
+ balanced:{stars:180,snow:65,branches:470,ornaments:23,garland:170,shooting:5,shotMin:500,shotMax:1100,dpr:1.45,fps:45,glow:.78},
+ high:{stars:285,snow:105,branches:700,ornaments:34,garland:235,shooting:10,shotMin:300,shotMax:800,dpr:1.7,fps:60,glow:.95},
+ ultra:{stars:430,snow:155,branches:930,ornaments:45,garland:300,shooting:24,shotMin:90,shotMax:280,shotBatch:4,dpr:2.0,fps:120,glow:1}
+};
+let selectedQuality='auto',activeProfile='balanced',profile=profiles.balanced;
+let W=innerWidth,H=innerHeight,DPR=1,scaleFactor=1,renderScale=1;
+let yaw=-.32,tilt=.10,zoom=1,dragging=false,lastX=0,lastY=0,pinchStart=0,pinchZoom=1;
+let stars=[],snow=[],branches=[],ornaments=[],garland=[],shooters=[];
+let lastTime=0,accum=0,fps=0,fpsFrames=0,fpsTime=0,frameCounter=0,lastShot=0;
+let autoScale=1,lowFpsTicks=0,highFpsTicks=0;
+const rand=(a,b)=>a+Math.random()*(b-a), clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const reduced= reducedMotion;
+
+function deviceTier(){
+ const mem=navigator.deviceMemory||4, cores=navigator.hardwareConcurrency||4;
+ const small=Math.min(screen.width||W,screen.height||H)<390;
+ if(mem<=2||cores<=4||small)return 'eco';
+ if(mem>=8&&cores>=8)return 'high';
+ return 'balanced';
+}
+function getProfile(){
+ if(selectedQuality==='auto'){
+   const tier=deviceTier();
+   return tier==='high'?profiles.high:tier==='eco'?profiles.eco:profiles.balanced;
+ }
+ return selectedQuality==='ultra'?profiles.ultra:profiles[selectedQuality];
+}
+function setQuality(q){
+ selectedQuality=q;
+ profile=getProfile();
+ activeProfile=selectedQuality==='auto'? (profile===profiles.eco?'eco':profile===profiles.high?'high':'balanced') : selectedQuality;
+ autoScale=1;lowFpsTicks=0;highFpsTicks=0;
+ document.querySelectorAll('[data-quality]').forEach(b=>b.classList.toggle('selected',b.dataset.quality===q));
+ document.getElementById('qualityStatus').textContent=qualityNames[q]+(q==='auto'?' · '+(activeProfile==='eco'?'偏省电':activeProfile==='high'?'高性能':'均衡设备档'):'');
+ rebuildScene();resize();
+}
+function resize(){
+ W=innerWidth;H=innerHeight;
+ const cap=profile.dpr;
+ const device=Math.min(window.devicePixelRatio||1,cap);
+ renderScale=Math.min(cap,device)*(selectedQuality==='auto'?autoScale:1);
+ renderScale=clamp(renderScale,.65,2);
+ canvas.width=Math.max(1,Math.round(W*renderScale));
+ canvas.height=Math.max(1,Math.round(H*renderScale));
+ canvas.style.width=W+'px';canvas.style.height=H+'px';
+ ctx.setTransform(renderScale,0,0,renderScale,0,0);
+}
+function makeSceneData(){
+ stars=[];snow=[];branches=[];ornaments=[];garland=[];shooters=[];
+ const p=profile;
+ for(let i=0;i<p.stars;i++)stars.push({x:Math.random(),y:Math.random(),r:rand(.35,1.55),a:rand(.2,.9),phase:rand(0,6.28),speed:rand(.3,1.8),warm:Math.random()<.18});
+ for(let i=0;i<p.snow;i++)snow.push({x:Math.random(),y:Math.random(),z:rand(.25,1),r:rand(.7,2.0),v:rand(12,36),drift:rand(-9,9),phase:rand(0,6.28)});
+ const layers=13;
+ for(let l=0;l<layers;l++){
+  const y=.28+l*.48;
+  const radius=2.28*Math.pow(Math.max(.025,1-y/6.62),.88);
+  const n=Math.max(12,Math.round(p.branches/layers));
+  for(let j=0;j<n;j++){
+   const a=(j/n)*Math.PI*2+(l%2)*.075+rand(-.055,.055);
+   const rr=radius*rand(.88,1.08),spread=rand(.07,.15);
+   const depth=(Math.cos(a)*Math.sin(yaw)+Math.sin(a)*Math.cos(yaw));
+   branches.push({a,y:y+rand(-.09,.09),r:rr,spread,drop:rand(.12,.32),hue:rand(-7,8),light:rand(.35,.85),phase:rand(0,6.28)});
+  }
+ }
+ for(let i=0;i<p.ornaments;i++){
+  const y=rand(.55,5.95),r=2.24*Math.pow(Math.max(.04,1-y/6.65),.9);
+  ornaments.push({a:rand(0,6.28),y,r:r*rand(.86,1.04),size:rand(3.2,6.4),color:['#f7c86d','#d85f69','#82c9ed','#e8e0d0'][i%4],phase:rand(0,6.28)});
+ }
+ const points=p.garland;
+ for(let i=0;i<=points;i++){
+  const t=i/points,y=.38+t*6.05,a=t*Math.PI*2*3.2;
+  const r=2.20*Math.pow(Math.max(.03,1-y/6.62),.88)+.04;
+  garland.push({x:Math.cos(a)*r,y,z:Math.sin(a)*r});
+ }
+ for(let i=0;i<Math.min(110,Math.round(p.garland*.42));i++){
+  const t=i/Math.min(110,Math.round(p.garland*.42)),y=.48+t*5.85,a=t*Math.PI*2*3.2;
+  const r=2.19*Math.pow(Math.max(.03,1-y/6.62),.88)+.05;
+  garland.push({bulb:true,x:Math.cos(a)*r,y,z:Math.sin(a)*r,color:i%4===0?'#b7eaff':i%3===0?'#ffe3a0':'#f9d37c'});
+ }
+}
+function rebuildScene(){makeSceneData();}
+function project(x,y,z){
+ const cy=Math.cos(yaw),sy=Math.sin(yaw),ct=Math.cos(tilt),st=Math.sin(tilt);
+ const rx=x*cy-z*sy,rz=x*sy+z*cy;
+ const vy=y*ct-rz*st,vz=y*st+rz*ct;
+ const scale=Math.min(W*.31,H*.096)*zoom;
+ const persp=1+vz*.014;
+ return {x:W*.5+rx*scale*persp,y:H*.815-vy*scale*persp,z:vz};
+}
+function background(t){
+ ctx.fillStyle='#040916';ctx.fillRect(0,0,W,H);
+ let g=ctx.createRadialGradient(W*.5,H*.48,0,W*.5,H*.48,Math.max(W,H)*.82);
+ g.addColorStop(0,'rgba(22,52,83,.48)');g.addColorStop(.48,'rgba(9,24,48,.3)');g.addColorStop(1,'rgba(1,5,15,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ let neb=ctx.createRadialGradient(W*.18,H*.25,0,W*.18,H*.25,W*.58);
+ neb.addColorStop(0,'rgba(30,83,122,.10)');neb.addColorStop(1,'rgba(12,34,70,0)');ctx.fillStyle=neb;ctx.fillRect(0,0,W,H);
+ for(const s of stars){
+  const tw=.58+.42*Math.sin(t*s.speed+s.phase),alpha=s.a*tw;
+  const x=s.x*W,y=s.y*H;
+  ctx.globalAlpha=alpha;
+  ctx.fillStyle=s.warm?'#ffe5bd':'#cdeaff';
+  ctx.beginPath();ctx.arc(x,y,s.r*(s.r>1.2?1.15:1),0,Math.PI*2);ctx.fill();
+  if(s.r>1.25&&profile.glow>.7){ctx.globalAlpha=alpha*.28;ctx.fillRect(x-4,y-.35,8,.7);ctx.fillRect(x-.35,y-4,.7,8);}
+ }
+ ctx.globalAlpha=1;
+}
+function drawSnow(dt,t){
+ ctx.save();ctx.fillStyle='#e7f4ff';
+ for(const s of snow){
+  s.y+=s.v*dt/H;s.x+=Math.sin(t*.0007+s.phase)*s.drift*dt/W;
+  if(s.y>1.04){s.y=-.04;s.x=Math.random();}
+  if(s.x<-.03)s.x=1.03;if(s.x>1.03)s.x=-.03;
+  ctx.globalAlpha=.22+s.z*.55;ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r*s.z,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.restore();
+}
+function drawShooters(t,dt){
+if(!reduced && t-lastShot>rand(profile.shotMin,profile.shotMax) && shooters.length<profile.shooting){
+  lastShot=t;
+  const count=Math.min(profile.shooting-shooters.length,1+Math.floor(Math.random()*(profile.shotBatch||2)));
+  for(let k=0;k<count;k++){
+   shooters.push({x:rand(-.15,.9)*W,y:rand(.02,.5)*H,vx:rand(280,540),vy:rand(140,270),life:0,max:rand(.65,1.3),len:rand(75,190)});
+  }
+ }
+ for(let i=shooters.length-1;i>=0;i--){
+  const s=shooters[i];s.life+=dt;s.x+=s.vx*dt;s.y+=s.vy*dt;
+  const a=1-s.life/s.max;if(a<=0||s.x>W+100){shooters.splice(i,1);continue;}
+  const len=s.len;const grad=ctx.createLinearGradient(s.x,s.y,s.x-s.vx*.22,s.y-s.vy*.22);
+  grad.addColorStop(0,'rgba(255,255,255,.95)');grad.addColorStop(.22,'rgba(174,224,255,.65)');grad.addColorStop(1,'rgba(150,198,255,0)');
+  ctx.globalAlpha=a;ctx.strokeStyle=grad;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x-len,s.y-len*.52);ctx.stroke();
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(s.x,s.y,2.2,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;
+}
+function branchPolygon(b){
+ const a=b.a,ca=Math.cos(a),sa=Math.sin(a),ta=b.spread;
+ const pts=[
+  [b.r*.06,b.y+.12,a],
+  [b.r*.64,b.y+.13,a-ta],
+  [b.r*1.03,b.y-b.drop,a],
+  [b.r*.61,b.y-.10,a+ta]
+ ];
+ const out=[];
+ for(const [r,y,ang] of pts)out.push(project(Math.cos(ang)*r,y,Math.sin(ang)*r));
+ return out;
+}
+function drawTree(t){
+ // Ambient ground aura
+ const baseY=H*.817,baseX=W*.5;
+ const aura=ctx.createRadialGradient(baseX,baseY,2,baseX,baseY,Math.min(W*.48,210));
+ aura.addColorStop(0,'rgba(72,153,181,.20)');aura.addColorStop(.42,'rgba(34,102,133,.08)');aura.addColorStop(1,'rgba(5,15,29,0)');ctx.fillStyle=aura;ctx.fillRect(baseX-Math.min(W*.5,220),baseY-50,Math.min(W,440),130);
+ const ordered=branches.map(b=>({b,z:Math.sin(b.a+yaw)*b.r})).sort((a,b)=>a.z-b.z);
+ for(const item of ordered){
+  const b=item.b,p=branchPolygon(b);const center=project(Math.cos(b.a)*b.r*.48,b.y,Math.sin(b.a)*b.r*.48);
+  const shade=clamp(.48+item.z*.12+b.light*.32,.28,.95);
+  const hue=116+b.hue;
+  ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y);ctx.closePath();
+  ctx.fillStyle=`hsla(${hue},${42+shade*15}%,${12+shade*17}%,.98)`;ctx.fill();
+  ctx.strokeStyle=`hsla(${hue+8},58%,${20+shade*19}%,.78)`;ctx.lineWidth=.8;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);ctx.quadraticCurveTo(center.x,center.y,p[2].x,p[2].y);
+  ctx.strokeStyle=`rgba(126,190,139,${.09+shade*.17})`;ctx.lineWidth=.75;ctx.stroke();
+ }
+ // Trunk
+ const tr1=project(0,0,0),tr2=project(0,.95,0);
+ ctx.strokeStyle='#69442e';ctx.lineWidth=Math.max(4,Math.min(9,W*.018));ctx.beginPath();ctx.moveTo(tr1.x,tr1.y);ctx.lineTo(tr2.x,tr2.y);ctx.stroke();
+ // Golden spiral garland
+ ctx.beginPath();let started=false;
+ for(let i=0;i<=profile.garland;i++){
+  const t=i/profile.garland,y=.38+t*6.05,a=t*Math.PI*2*3.2,r=2.20*Math.pow(Math.max(.03,1-y/6.62),.88)+.04;
+  const p=project(Math.cos(a)*r,y,Math.sin(a)*r);
+  if(!started){ctx.moveTo(p.x,p.y);started=true;}else ctx.lineTo(p.x,p.y);
+ }
+ ctx.strokeStyle='rgba(255,207,119,.78)';ctx.lineWidth=1.3;ctx.shadowColor='rgba(255,190,92,.8)';ctx.shadowBlur=7*profile.glow;ctx.stroke();ctx.shadowBlur=0;
+ // Garland lights
+ const bulbCount=Math.min(110,Math.round(profile.garland*.42));
+ for(let i=0;i<bulbCount;i++){
+  const t=i/bulbCount,y=.48+t*5.85,a=t*Math.PI*2*3.2,r=2.19*Math.pow(Math.max(.03,1-y/6.62),.88)+.05;
+  const p=project(Math.cos(a)*r,y,Math.sin(a)*r);const pulse=.65+.35*Math.sin(t*35+Date.now()*.002);
+  ctx.globalAlpha=.65+.35*pulse;ctx.fillStyle=i%4===0?'#a9eaff':i%3===0?'#ffe7a5':'#fff0c7';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=(4+4*pulse)*profile.glow;
+  ctx.beginPath();ctx.arc(p.x,p.y,1.25+profile.glow*.65,0,Math.PI*2);ctx.fill();
+ }
+ ctx.globalAlpha=1;ctx.shadowBlur=0;
+ // Ornaments
+ for(const o of ornaments){
+  const x=Math.cos(o.a)*o.r,y=o.y,z=Math.sin(o.a)*o.r,p=project(x,y,z),r=o.size*clamp(1+p.z*.018,.78,1.15);
+  const grad=ctx.createRadialGradient(p.x-r*.35,p.y-r*.4,.5,p.x,p.y,r*1.2);
+  grad.addColorStop(0,'#ffffff');grad.addColorStop(.22,o.color);grad.addColorStop(1,'rgba(16,24,45,.85)');
+  ctx.fillStyle=grad;ctx.shadowColor=o.color;ctx.shadowBlur=7*profile.glow;ctx.beginPath();ctx.arc(p.x,p.y,r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(255,255,255,.7)';ctx.beginPath();ctx.arc(p.x-r*.28,p.y-r*.3,Math.max(.6,r*.17),0,Math.PI*2);ctx.fill();
+ }
+ // Top star
+ const top=project(0,6.75,0),pulse=.88+.12*Math.sin(t*.0025);
+ ctx.save();ctx.translate(top.x,top.y);ctx.scale(pulse,pulse);
+ ctx.shadowColor='#ffd97e';ctx.shadowBlur=22*profile.glow;
+ starPath(0,0,15,6.3,5);ctx.fillStyle='#ffe7a8';ctx.fill();ctx.shadowBlur=0;
+ ctx.strokeStyle='rgba(255,255,255,.92)';ctx.lineWidth=1;ctx.stroke();
+ ctx.restore();
+}
+function starPath(x,y,r1,r2,n){ctx.beginPath();for(let i=0;i<n*2;i++){const a=-Math.PI/2+i*Math.PI/n,r=i%2?r2:r1,px=x+Math.cos(a)*r,py=y+Math.sin(a)*r;if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();}
+function draw(dt,t){
+ background(t);drawShooters(t,dt);drawTree(t);drawSnow(dt,t);
+ // very subtle lower reflection / vignette
+ const ground=ctx.createLinearGradient(0,H*.79,0,H);ground.addColorStop(0,'rgba(7,19,34,0)');ground.addColorStop(1,'rgba(1,5,14,.38)');ctx.fillStyle=ground;ctx.fillRect(0,H*.78,W,H*.22);
+}
+function updateFPS(now){
+ fpsFrames++;if(!fpsTime)fpsTime=now;
+ if(now-fpsTime>=1000){fps=fpsFrames*1000/(now-fpsTime);fpsFrames=0;fpsTime=now;
+  document.getElementById('fpsStatus').textContent=Math.round(fps)+' FPS';
+  if(selectedQuality==='auto'){
+   if(fps<34){lowFpsTicks++;highFpsTicks=0;}else if(fps>52){highFpsTicks++;lowFpsTicks=0;}else{lowFpsTicks=0;highFpsTicks=0;}
+   if(lowFpsTicks>=2&&autoScale>.72){autoScale=Math.max(.72,autoScale-.1);resize();lowFpsTicks=0;}
+   else if(highFpsTicks>=5&&autoScale<1){autoScale=Math.min(1,autoScale+.05);resize();highFpsTicks=0;}
+  }
+ }
+}
+function loop(now){
+ requestAnimationFrame(loop);
+ if(document.hidden)return;
+ if(!lastTime)lastTime=now;
+ let dt=Math.min(.05,(now-lastTime)/1000);lastTime=now;
+ const frameInterval=1000/profile.fps;
+ accum+=dt*1000;
+ if(accum<frameInterval)return;
+ dt=Math.min(.06,accum/1000);accum=0;
+ if(!reduced){yaw+=dt*.025;}
+ draw(dt,now);updateFPS(now);frameCounter++;
+}
+function pointerDown(e){
+ canvas.setPointerCapture?.(e.pointerId);
+ if(e.pointerType==='touch'&&touchPoints.size===1){dragging=true;lastX=e.clientX;lastY=e.clientY;}
+ else if(e.pointerType!=='touch'){dragging=true;lastX=e.clientX;lastY=e.clientY;}
+}
+const touchPoints=new Map();
+canvas.addEventListener('pointerdown',e=>{touchPoints.set(e.pointerId,{x:e.clientX,y:e.clientY});pointerDown(e);if(touchPoints.size===2){const a=[...touchPoints.values()];pinchStart=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);pinchZoom=zoom;dragging=false;}});
+canvas.addEventListener('pointermove',e=>{
+ if(!touchPoints.has(e.pointerId))return;
+ touchPoints.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(touchPoints.size>=2){const a=[...touchPoints.values()];const d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinchStart>0)zoom=clamp(pinchZoom*d/pinchStart,.72,1.5);}
+ else if(dragging){const dx=e.clientX-lastX,dy=e.clientY-lastY;yaw+=dx*.0062;tilt=clamp(tilt+dy*.0022,-.16,.36);}
+ lastX=e.clientX;lastY=e.clientY;
+});
+function pointerUp(e){touchPoints.delete(e.pointerId);if(touchPoints.size<2)pinchStart=0;if(touchPoints.size===0)dragging=false;}
+canvas.addEventListener('pointerup',pointerUp);canvas.addEventListener('pointercancel',pointerUp);canvas.addEventListener('lostpointercapture',pointerUp);
+canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=clamp(zoom*(e.deltaY>0?.94:1.06),.72,1.5);},{passive:false});
+window.addEventListener('resize',resize,{passive:true});
+document.addEventListener('visibilitychange',()=>{lastTime=0;});
+function openSettings(){document.getElementById('settingsOverlay').classList.remove('hidden');}
+function closeSettings(){document.getElementById('settingsOverlay').classList.add('hidden');}
+document.getElementById('settingsBtn').addEventListener('click',openSettings);
+document.getElementById('closeSettings').addEventListener('click',closeSettings);
+document.getElementById('resumeBtn').addEventListener('click',closeSettings);
+document.getElementById('enterBtn').addEventListener('click',()=>{document.getElementById('welcome').classList.add('hidden');startMusic();});
+for(const id of ['qualityChoices','settingsChoices'])document.getElementById(id).addEventListener('click',e=>{const b=e.target.closest('[data-quality]');if(b)setQuality(b.dataset.quality);});
+// ===== 背景音乐（同目录 mp3）=====
+const AUDIO_URL = "./123.mp3";
+let localAudio=null;
+function startMusic(){
+  if(!localAudio){
+    localAudio=new Audio();
+    localAudio.loop=true;
+    localAudio.preload='auto';
+    localAudio.src=AUDIO_URL;
+    localAudio.volume=0;
+  }
+  const p=localAudio.play();
+  if(p&&p.catch)p.catch(()=>{});
+  let v=0;
+  const t=setInterval(()=>{
+    v+=0.05;
+    if(v>=0.6){v=0.6;clearInterval(t);}
+    localAudio.volume=v;
+  },50);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(!localAudio)return;
+  if(document.hidden)localAudio.pause();
+  else localAudio.play().catch(()=>{});
+});
+// Initial low-cost preview, then selected quality scene.
+setQuality('auto');
+resize();
+if(reduced){document.getElementById('gestureHint').textContent='轻触并拖动旋转 · 双指缩放';}
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
